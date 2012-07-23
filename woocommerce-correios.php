@@ -116,13 +116,13 @@ function shipping_correios(){
                 'cod_empresa' => array(
                     'title' 		=> __( 'Código Administrativo', 'woocommerce' ), 
                     'type' 			=> 'text', 
-                    'label' 		=> __( 'The administrative code registered in Correios (necessary for eSedex)', 'woocommerce' ), 
+                    'description' 		=> __( 'The administrative code registered in Correios (necessary for eSedex)', 'woocommerce' ), 
                     'default' 		=> ''
                 ),
                 'senha' => array(
                     'title' 		=> __( 'Senha', 'woocommerce' ), 
                     'type' 			=> 'text', 
-                    'label' 		=> __( 'Password to access the services for you contract (necessary for eSedex)', 'woocommerce' ), 
+                    'description' 		=> __( 'Password to access the services for you contract (necessary for eSedex)', 'woocommerce' ), 
                     'default' 		=> ''
                 )
             );
