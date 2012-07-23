@@ -44,6 +44,8 @@ function shipping_correios(){
             $this->enable_sedex_cobrar = $this->settings['enable_sedex_cobrar']; 
             $this->enable_sedex10 = $this->settings['enable_sedex10']; 
             $this->enable_esedex = $this->settings['enable_esedex']; 
+            $this->cod_empresa = $this->settings['cod_empresa']; 
+            $this->senha = $this->settings['senha']; 
             
             // Logs
             if ($this->debug=='yes') $this->log = $woocommerce->logger();
@@ -110,6 +112,18 @@ function shipping_correios(){
                     'type' 			=> 'checkbox', 
                     'label' 		=> __( 'Enable e-Sedex (with contract) shipping method', 'woocommerce' ), 
                     'default' 		=> 'yes'
+                ),
+                'cod_empresa' => array(
+                    'title' 		=> __( 'Código Administrativo', 'woocommerce' ), 
+                    'type' 			=> 'text', 
+                    'label' 		=> __( 'The administrative code registered in Correios (necessary for eSedex)', 'woocommerce' ), 
+                    'default' 		=> ''
+                ),
+                'senha' => array(
+                    'title' 		=> __( 'Senha', 'woocommerce' ), 
+                    'type' 			=> 'text', 
+                    'label' 		=> __( 'Password to access the services for you contract (necessary for eSedex)', 'woocommerce' ), 
+                    'default' 		=> ''
                 )
             );
         }
@@ -127,7 +141,7 @@ function shipping_correios(){
             return apply_filters( 'woocommerce_shipping_' . $this->id . '_is_available', true );
         }
         
-        function calculaFrete($cod_servico, $cep_origem, $cep_destino, $peso, $altura='2', $largura='11', $comprimento='16', $valor_declarado='0.50'){
+        function calculaFrete($cod_servico, $cep_origem, $cep_destino, $peso, $altura='2', $largura='11', $comprimento='16', $valor_declarado='0.50', $codigo_empresa='',$senha=''){
             #OFICINADANET###############################
             # Código dos Serviços dos Correios
             # 41106 PAC sem contrato
@@ -138,7 +152,7 @@ function shipping_correios(){
             ############################################
             global $woocommerce;
             
-            $correios = "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=&sDsSenha=&sCepOrigem=".$cep_origem."&sCepDestino=".$cep_destino."&nVlPeso=".$peso."&nCdFormato=1&nVlComprimento=".$comprimento."&nVlAltura=".$altura."&nVlLargura=".$largura."&sCdMaoPropria=n&nVlValorDeclarado=".$valor_declarado."&sCdAvisoRecebimento=n&nCdServico=".$cod_servico."&nVlDiametro=0&StrRetorno=xml";
+            $correios = "http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?nCdEmpresa=".$codigo_empresa."&sDsSenha=".$senha."&sCepOrigem=".$cep_origem."&sCepDestino=".$cep_destino."&nVlPeso=".$peso."&nCdFormato=1&nVlComprimento=".$comprimento."&nVlAltura=".$altura."&nVlLargura=".$largura."&sCdMaoPropria=n&nVlValorDeclarado=".$valor_declarado."&sCdAvisoRecebimento=n&nCdServico=".$cod_servico."&nVlDiametro=0&StrRetorno=xml";
             if ($this->debug=='yes') $this->log->add( 'correios', "URL: ".$correios);
             $xml = simplexml_load_file($correios);
             if($xml->cServico->Erro == '0')
@@ -204,7 +218,7 @@ function shipping_correios(){
                 if ($this->debug=='yes') $this->log->add( 'correios', "Valor SEDEX 10: ".$cost_sedex10);
                 $this->add_rate(array('id'=> 'sedex10','label'=> 'SEDEX 10','cost'=> $cost_sedex10,'calc_tax'=>'per_order'));
             }
-            if($this->enable_esedex=='yes') {
+            if($this->enable_esedex=='yes' && $this->cod_empresa!='' && $this->senha!='') {
                 $cost_esedex = number_format($this->calculaFrete('81019',$this->postalcode,$woocommerce->customer->get_postcode(),$peso_cubico,$height ,$width,$length,$valor_total),2,'.','');
                 if ($this->debug=='yes') $this->log->add( 'correios', "Valor e-Sedex: ".$cost_esedex);
                 $this->add_rate(array('id'=> 'esedex','label'=> 'e-Sedex','cost'=> $cost_esedex,'calc_tax'=>'per_order'));
