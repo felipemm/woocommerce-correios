@@ -43,6 +43,7 @@ function shipping_correios(){
             $this->enable_sedex = $this->settings['enable_sedex']; 
             $this->enable_sedex_cobrar = $this->settings['enable_sedex_cobrar']; 
             $this->enable_sedex10 = $this->settings['enable_sedex10']; 
+            $this->enable_esedex = $this->settings['enable_esedex']; 
             
             // Logs
             if ($this->debug=='yes') $this->log = $woocommerce->logger();
@@ -103,6 +104,12 @@ function shipping_correios(){
                     'type' 			=> 'checkbox', 
                     'label' 		=> __( 'Enable SEDEX 10 shipping method', 'woocommerce' ), 
                     'default' 		=> 'yes'
+                ),
+                'enable_esedex' => array(
+                    'title' 		=> __( 'e-Sedex', 'woocommerce' ), 
+                    'type' 			=> 'checkbox', 
+                    'label' 		=> __( 'Enable e-Sedex (with contract) shipping method', 'woocommerce' ), 
+                    'default' 		=> 'yes'
                 )
             );
         }
@@ -110,7 +117,7 @@ function shipping_correios(){
         function admin_options() {
             global $woocommerce; ?>
             <h3><?php echo $this->method_title; ?></h3>
-            <p><?php _e('Local pickup is a simple method which allows the customer to pick up their order themselves.', 'woocommerce'); ?></p>
+            <p><?php _e('Correios is the Brazil postal office method of shipping, and you can enable several shipping methods for it.', 'woocommerce'); ?></p>
             <table class="form-table">
                 <?php $this->generate_settings_html(); ?>
             </table> <?php
@@ -196,6 +203,11 @@ function shipping_correios(){
                 $cost_sedex10 = number_format($this->calculaFrete('40215',$this->postalcode,$woocommerce->customer->get_postcode(),$peso_cubico,$height ,$width,$length,$valor_total),2,'.','');
                 if ($this->debug=='yes') $this->log->add( 'correios', "Valor SEDEX 10: ".$cost_sedex10);
                 $this->add_rate(array('id'=> 'sedex10','label'=> 'SEDEX 10','cost'=> $cost_sedex10,'calc_tax'=>'per_order'));
+            }
+            if($this->enable_esedex=='yes') {
+                $cost_esedex = number_format($this->calculaFrete('81019',$this->postalcode,$woocommerce->customer->get_postcode(),$peso_cubico,$height ,$width,$length,$valor_total),2,'.','');
+                if ($this->debug=='yes') $this->log->add( 'correios', "Valor e-Sedex: ".$cost_esedex);
+                $this->add_rate(array('id'=> 'esedex','label'=> 'e-Sedex','cost'=> $cost_esedex,'calc_tax'=>'per_order'));
             }
         }
     }
