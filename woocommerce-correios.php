@@ -1,8 +1,8 @@
-﻿<?php
+<?php
 /*
 Plugin Name: WooCommerce Correios
 Plugin URI: http://felipematos.com/loja
-Description: Adiciona o método de entrega por correios
+Description: Adiciona entrega por correios
 Version: 1.0
 Author: Felipe Matos <chucky_ath@yahoo.com.br>
 Author URI: http://felipematos.com
@@ -20,7 +20,7 @@ function shipping_correios(){
 
         function __construct() { 
             $this->id = 'correios';
-            $this->method_title = __('Correios Brasil', 'woocommerce');
+            $this->method_title = __('Correios Brasil', 'woothemes');
             
             $this->init();
         }
@@ -60,82 +60,90 @@ function shipping_correios(){
         function init_form_fields() {
             $this->form_fields = array(
                 'enabled' => array(
-                    'title' 		=> __( 'Enable', 'woocommerce' ), 
-                    'type' 			=> 'checkbox', 
-                    'label' 		=> __( 'Enable local pickup', 'woocommerce' ), 
-                    'default' 		=> 'yes'
+                    'title'  => __( 'Enable', 'woothemes' ), 
+                    'type' => 'checkbox', 
+                    'label' => __( 'Enable local pickup', 'woothemes' ), 
+                    'default' => 'yes'
                 ),
                 'title' => array(
-                    'title' => __( 'Title', 'woocommerce' ),
+                    'title' => __( 'Title', 'woothemes' ),
                     'type' => 'text',
-                    'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-                    'default' => __( 'Correios', 'woocommerce' )
+                    'description' => __( 'This controls the title which the user sees during checkout.', 'woothemes' ),
+                    'default' => __( 'Correios', 'woothemes' )
                 ),
                 'postalcode' => array(
-                    'title' => __( 'Sender Postal Code', 'woocommerce' ),
+                    'title' => __( 'Sender Postal Code', 'woothemes' ),
                     'type' => 'text',
-                    'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
-                    'default' => __( '05713520', 'woocommerce' )
+                    'description' => __( 'This controls the title which the user sees during checkout.', 'woothemes' ),
+                    'default' => __( '05713520', 'woothemes' )
                 ),
                 'debug' => array(
-                    'title' 		=> __( 'Debug', 'woocommerce' ), 
-                    'type' 			=> 'checkbox', 
-                    'label' 		=> __( 'Enable debugging <code>/woocommerce/logs/correios.log</code>', 'woocommerce' ), 
-                    'default' 		=> 'yes'
+                    'title' => __( 'Debug', 'woothemes' ), 
+                    'type' => 'checkbox', 
+                    'label' => __( 'Enable debugging <code>/woocommerce/logs/correios.log</code>', 'woothemes' ), 
+                    'default' => 'yes'
                 ),
                 'enable_pac' => array(
-                    'title' 		=> __( 'PAC', 'woocommerce' ), 
-                    'type' 			=> 'checkbox', 
-                    'label' 		=> __( 'Enable PAC shipping method', 'woocommerce' ), 
-                    'default' 		=> 'yes'
+                    'title' => __( 'PAC', 'woothemes' ), 
+                    'type' => 'checkbox', 
+                    'label' => __( 'Enable PAC shipping method', 'woothemes' ), 
+                    'default' => 'yes'
                 ),
                 'enable_sedex' => array(
-                    'title' 		=> __( 'SEDEX', 'woocommerce' ), 
-                    'type' 			=> 'checkbox', 
-                    'label' 		=> __( 'Enable SEDEX shipping method', 'woocommerce' ), 
-                    'default' 		=> 'yes'
+                    'title' => __( 'SEDEX', 'woothemes' ), 
+                    'type' => 'checkbox', 
+                    'label' => __( 'Enable SEDEX shipping method', 'woothemes' ), 
+                    'default' => 'yes'
                 ),
                 'enable_sedex_cobrar' => array(
-                    'title' 		=> __( 'SEDEX a Cobrar', 'woocommerce' ), 
-                    'type' 			=> 'checkbox', 
-                    'label' 		=> __( 'Enable SEDEX a cobrar shipping method', 'woocommerce' ), 
-                    'default' 		=> 'yes'
+                    'title' => __( 'SEDEX a Cobrar', 'woothemes' ), 
+                    'type' => 'checkbox', 
+                    'label' => __( 'Enable SEDEX a cobrar shipping method', 'woothemes' ), 
+                    'default' => 'yes'
                 ),
                 'enable_sedex10' => array(
-                    'title' 		=> __( 'SEDEX 10', 'woocommerce' ), 
-                    'type' 			=> 'checkbox', 
-                    'label' 		=> __( 'Enable SEDEX 10 shipping method', 'woocommerce' ), 
-                    'default' 		=> 'yes'
+                    'title' => __( 'SEDEX 10', 'woothemes' ), 
+                    'type' => 'checkbox', 
+                    'label' => __( 'Enable SEDEX 10 shipping method', 'woothemes' ), 
+                    'default' => 'yes'
                 ),
                 'enable_esedex' => array(
-                    'title' 		=> __( 'e-Sedex', 'woocommerce' ), 
-                    'type' 			=> 'checkbox', 
-                    'label' 		=> __( 'Enable e-Sedex (with contract) shipping method', 'woocommerce' ), 
-                    'default' 		=> 'yes'
+                    'title' => __( 'e-Sedex', 'woothemes' ), 
+                    'type' => 'checkbox', 
+                    'label' => __( 'Enable e-Sedex (with contract) shipping method', 'woothemes' ), 
+                    'default' => 'yes'
                 ),
                 'cod_empresa' => array(
-                    'title' 		=> __( 'Código Administrativo', 'woocommerce' ), 
-                    'type' 			=> 'text', 
-                    'description' 		=> __( 'The administrative code registered in Correios (necessary for eSedex)', 'woocommerce' ), 
-                    'default' 		=> ''
+                    'title' => __( 'Código Administrativo', 'woothemes' ), 
+                    'type' => 'text', 
+                    'description' => __( 'The administrative code registered in Correios (necessary for eSedex)', 'woothemes' ), 
+                    'default' => ''
                 ),
                 'senha' => array(
-                    'title' 		=> __( 'Senha', 'woocommerce' ), 
-                    'type' 			=> 'text', 
-                    'description' 		=> __( 'Password to access the services for you contract (necessary for eSedex)', 'woocommerce' ), 
-                    'default' 		=> ''
+                    'title' => __( 'Senha', 'woothemes' ), 
+                    'type' => 'text', 
+                    'description' => __( 'Password to access the services for you contract (necessary for eSedex)', 'woothemes' ), 
+                    'default' => ''
                 )
             );
         }
-        
-        function admin_options() {
-            global $woocommerce; ?>
-            <h3><?php echo $this->method_title; ?></h3>
-            <p><?php _e('Correios is the Brazil postal office method of shipping, and you can enable several shipping methods for it.', 'woocommerce'); ?></p>
-            <table class="form-table">
-                <?php $this->generate_settings_html(); ?>
-            </table> <?php
-        }
+
+		//======================================================================
+		//Admin Panel Options
+		//Options for bits like 'title' and availability on a country-by-country basis
+		//======================================================================
+		public function admin_options() {
+			?>
+			<h3><?php echo $this->method_title; ?></h3>
+			<p><?php _e('Correios is the Brazil postal office method of shipping, and you can enable several shipping methods for it.', 'woothemes'); ?></p>
+			<table class="form-table">
+				<?php
+				// Generate the HTML For the settings form.
+				$this->generate_settings_html();
+				?>
+			</table><!--/.form-table-->
+			<?php
+		} // End admin_options()
         
         function is_available( $package ) {
             return apply_filters( 'woocommerce_shipping_' . $this->id . '_is_available', true );
@@ -232,4 +240,3 @@ function shipping_correios(){
 
     add_filter('woocommerce_shipping_methods', 'add_correios_method' );
 }
-?>
