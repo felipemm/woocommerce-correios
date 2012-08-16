@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 	class frete_correios {
 		
 		//references:

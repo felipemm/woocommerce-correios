@@ -263,3 +263,4 @@ function shipping_correios(){
 
     add_filter('woocommerce_shipping_methods', 'add_correios_method' );
 }
+?>
