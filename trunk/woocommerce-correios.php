@@ -278,10 +278,10 @@ function shipping_correios(){
 					if($values['volume'] >= $volume){
 						if($values[0] >= $maxlength && $values[1] >= $maxwidth && $values[2] >= $maxheight){
 							if ($this->debug=='yes') $this->log->add( 'correios', "Melhor Caixa encontrada" );
-							if ($this->debug=='yes') $this->log->add( 'correios', "Melhor caixa: ".$length.'x'.$height.'x'.$width.' - Volume Calculado: '.$volume);
 							$length = $values[0];
 							$width  = $values[1];
 							$height = $values[2];
+							if ($this->debug=='yes') $this->log->add( 'correios', "Melhor caixa: ".$length.'x'.$height.'x'.$width.' - Volume Calculado: '.$volume);
 							break;
 						}
 					}
