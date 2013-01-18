@@ -1,20 +1,154 @@
 <?php
 /*
 Plugin Name: WooCommerce Correios
-Plugin URI: http://felipematos.com/loja
-Description: Adiciona entrega por correios
-Version: 1.4
+Plugin URI: http://wooplugins.com.br/loja/woocommerce-correios/
+Description: Adiciona entrega por correios, calculando o frete para diferentes modalidades de serviço.
+Version: 2.0
 Author: Felipe Matos <chucky_ath@yahoo.com.br>
 Author URI: http://felipematos.com
 Requires at least: 3.4
-Tested up to: 3.4.2
+Tested up to: 3.5
 */
+
+
+//-------------------------------------------------------------------------------------------
+// ##### PLUGIN AUTO UPDATE CODE #####
+//-------------------------------------------------------------------------------------------
+
+//Making sure wordpress does not check this plugin into their repository
+add_filter( 'http_request_args', 'correios_prevent_update_check', 10, 2 );
+function correios_prevent_update_check( $r, $url ) {
+    if ( 0 === strpos( $url, 'http://api.wordpress.org/plugins/update-check/' ) ) {
+        $my_plugin = plugin_basename( __FILE__ );
+        $plugins = unserialize( $r['body']['plugins'] );
+        unset( $plugins->plugins[$my_plugin] );
+        unset( $plugins->active[array_search( $my_plugin, $plugins->active )] );
+        $r['body']['plugins'] = serialize( $plugins );
+    }
+    return $r;
+}
+
+
+// TEMP: Enable update check on every request. Normally you don't need this! This is for testing only!
+// NOTE: The 
+//	if (empty($checked_data->checked))
+//		return $checked_data; 
+// lines will need to be commented in the check_for_plugin_update function as well.
+//get_site_transient( 'update_plugins' ); // unset the plugin
+//set_site_transient( 'update_plugins', '' ); // reset plugin database information
+// TEMP: Show which variables are being requested when query plugin API
+//add_filter('plugins_api_result', 'correios_result', 10, 3);
+//function correios_result($res, $action, $args) {
+//	print_r($res);
+//	return $res;
+//}
+// NOTE: All variables and functions will need to be prefixed properly to allow multiple plugins to be updated
+
+$api_url = 'http://update.wooplugins.com.br/';
+$plugin_slug = basename(dirname(__FILE__));
+
+// Take over the update check
+add_filter('pre_set_site_transient_update_plugins', 'correios_check_for_plugin_update');
+
+function correios_check_for_plugin_update($checked_data) {
+	global $api_url, $plugin_slug;
+	
+	//Comment out these two lines during testing.
+	//if (empty($checked_data->checked))
+	//	return $checked_data;
+	
+	$args = array(
+		'slug' => $plugin_slug,
+		'version' => $checked_data->checked[$plugin_slug .'/'. $plugin_slug .'.php'],
+	);
+	$request_string = array(
+			'body' => array(
+				'action' => 'basic_check', 
+				'request' => serialize($args),
+				'api-key' => md5(get_bloginfo('url'))
+			),
+			'user-agent' => 'WordPress/' . $wp_version . '; ' . get_bloginfo('url')
+		);
+	
+	// Start checking for an update
+	$raw_response = wp_remote_post($api_url, $request_string);
+	
+	if (!is_wp_error($raw_response) && ($raw_response['response']['code'] == 200))
+		$response = unserialize($raw_response['body']);
+	
+	if (is_object($response) && !empty($response)) // Feed the update data into WP updater
+		$checked_data->response[$plugin_slug .'/'. $plugin_slug .'.php'] = $response;
+	
+	return $checked_data;
+}
+
+
+// Take over the Plugin info screen
+add_filter('plugins_api', 'correios_plugin_api_call', 10, 3);
+
+function correios_plugin_api_call($def, $action, $args) {
+	global $plugin_slug, $api_url;
+	
+	if ($args->slug != $plugin_slug)
+		return false;
+	
+	// Get the current version
+	$plugin_info = get_site_transient('update_plugins');
+	$current_version = $plugin_info->checked[$plugin_slug .'/'. $plugin_slug .'.php'];
+	$args->version = $current_version;
+	
+	$request_string = array(
+			'body' => array(
+				'action' => $action, 
+				'request' => serialize($args),
+				'api-key' => md5(get_bloginfo('url'))
+			),
+			'user-agent' => 'WordPress/' . $wp_version . '; ' . get_bloginfo('url')
+		);
+	
+	$request = wp_remote_post($api_url, $request_string);
+	
+	if (is_wp_error($request)) {
+		$res = new WP_Error('plugins_api_failed', __('An Unexpected HTTP Error occurred during the API request.</p> <p><a href="?" onclick="document.location.reload(); return false;">Try again</a>'), $request->get_error_message());
+	} else {
+		$res = unserialize($request['body']);
+		
+		if ($res === false)
+			$res = new WP_Error('plugins_api_failed', __('An unknown error occurred'), $request['body']);
+	}
+	
+	return $res;
+}
+//-------------------------------------------------------------------------------------------
+// ##### PLUGIN AUTO UPDATE CODE #####
+//-------------------------------------------------------------------------------------------
+
+
+/**
+ * WooCommerce fallback notice.
+ */
+function correios_woocommerce_fallback_notice() {
+    $message = '<div class="error">';
+	$message .= '<p>' . __( 'WooCommerce Correios Shippong depends on the last version of <a href="http://wordpress.org/extend/plugins/woocommerce/">WooCommerce</a> to work!' , 'pagseguro' ) . '</p>';
+    $message .= '</div>';
+
+    echo $message;
+}
+
+
 
 //hook to include the payment gateway function
 add_action('plugins_loaded', 'shipping_correios', 0);
 
 //hook function
 function shipping_correios(){
+
+    if ( !class_exists( 'WC_Shipping_Method' )) {
+        add_action( 'admin_notices', 'correios_woocommerce_fallback_notice' );
+
+        return;
+    }
+
 
 	require_once('correios.php');
 
