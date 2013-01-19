@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: WooCommerce Correios
-Plugin URI: http://wooplugins.com.br/loja/woocommerce-correios/
+Plugin URI: http://wooplugins.com.br/loja/woocommerce-frete-correios/
 Description: Adiciona entrega por correios, calculando o frete para diferentes modalidades de serviço.
-Version: 2.0
+Version: 1.0
 Author: Felipe Matos <chucky_ath@yahoo.com.br>
 Author URI: http://felipematos.com
 Requires at least: 3.4
@@ -35,7 +35,7 @@ function correios_prevent_update_check( $r, $url ) {
 //		return $checked_data; 
 // lines will need to be commented in the check_for_plugin_update function as well.
 //get_site_transient( 'update_plugins' ); // unset the plugin
-//set_site_transient( 'update_plugins', '' ); // reset plugin database information
+//set_site_transient( 'update_plugins', null ); // reset plugin database information
 // TEMP: Show which variables are being requested when query plugin API
 //add_filter('plugins_api_result', 'correios_result', 10, 3);
 //function correios_result($res, $action, $args) {
@@ -45,21 +45,23 @@ function correios_prevent_update_check( $r, $url ) {
 // NOTE: All variables and functions will need to be prefixed properly to allow multiple plugins to be updated
 
 $api_url = 'http://update.wooplugins.com.br/';
-$plugin_slug = basename(dirname(__FILE__));
+$correios_slug = basename(dirname(__FILE__));
 
 // Take over the update check
 add_filter('pre_set_site_transient_update_plugins', 'correios_check_for_plugin_update');
 
 function correios_check_for_plugin_update($checked_data) {
-	global $api_url, $plugin_slug;
+	global $api_url, $correios_slug;
+
+	//var_dump($checked_data);
 	
 	//Comment out these two lines during testing.
-	//if (empty($checked_data->checked))
-	//	return $checked_data;
+	if (empty($checked_data->checked))
+		return $checked_data;
 	
 	$args = array(
-		'slug' => $plugin_slug,
-		'version' => $checked_data->checked[$plugin_slug .'/'. $plugin_slug .'.php'],
+		'slug' => $correios_slug,
+		'version' => $checked_data->checked[$correios_slug .'/'. $correios_slug .'.php'],
 	);
 	$request_string = array(
 			'body' => array(
@@ -77,7 +79,7 @@ function correios_check_for_plugin_update($checked_data) {
 		$response = unserialize($raw_response['body']);
 	
 	if (is_object($response) && !empty($response)) // Feed the update data into WP updater
-		$checked_data->response[$plugin_slug .'/'. $plugin_slug .'.php'] = $response;
+		$checked_data->response[$correios_slug .'/'. $correios_slug .'.php'] = $response;
 	
 	return $checked_data;
 }
@@ -87,14 +89,14 @@ function correios_check_for_plugin_update($checked_data) {
 add_filter('plugins_api', 'correios_plugin_api_call', 10, 3);
 
 function correios_plugin_api_call($def, $action, $args) {
-	global $plugin_slug, $api_url;
+	global $correios_slug, $api_url;
 	
-	if ($args->slug != $plugin_slug)
+	if ($args->slug != $correios_slug)
 		return false;
 	
 	// Get the current version
 	$plugin_info = get_site_transient('update_plugins');
-	$current_version = $plugin_info->checked[$plugin_slug .'/'. $plugin_slug .'.php'];
+	$current_version = $plugin_info->checked[$correios_slug .'/'. $correios_slug .'.php'];
 	$args->version = $current_version;
 	
 	$request_string = array(
