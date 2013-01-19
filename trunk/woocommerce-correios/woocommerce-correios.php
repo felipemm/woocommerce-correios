@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce Correios
 Plugin URI: http://wooplugins.com.br/loja/woocommerce-frete-correios/
 Description: Adiciona entrega por correios, calculando o frete para diferentes modalidades de serviço.
-Version: 1.0
+Version: 2.0
 Author: Felipe Matos <chucky_ath@yahoo.com.br>
 Author URI: http://felipematos.com
 Requires at least: 3.4
