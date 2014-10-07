@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce Correios
 Plugin URI: http://felipematos.com/loja
 Description: Adiciona entrega por correios
-Version: 1.3
+Version: 1.3.1
 Author: Felipe Matos <chucky_ath@yahoo.com.br>
 Author URI: http://felipematos.com
 Requires at least: 3.0
@@ -194,19 +194,48 @@ function shipping_correios(){
             foreach ($woocommerce->cart->get_cart() as $item_id => $values) {
                 $_product = $values['data'];
                 if ($values['quantity']>0) { //&& $_product->needs_shipping()) {
-					for($i=0;$i<$values['quantity'];$i++){
+					//for($i=0;$i<$values['quantity'];$i++){
 						if($_product->has_dimensions()){
-							//if ($this->debug=='yes') $this->log->add( 'correios', "Produto: ".$_product->get_sku());
-							//if ($this->debug=='yes') $this->log->add( 'correios', "Dimensões: ".$_product->get_dimensions());
-							//if ($this->debug=='yes') $this->log->add( 'correios', "Peso: ".$_product->get_weight());
-							$dimensions = explode(' × ',$_product->get_dimensions());
-							$length += $dimensions[0];
-							$width += $dimensions[1];
-							$height += str_replace(' '.get_option('woocommerce_dimension_unit'),'',$dimensions[2]);
-							$weight += $_product->get_weight();
-							$valor_total += $_product->get_price();
+							//comprimento é a maior dimensão
+							if($_product->width >= $_product->length && $_product->width >= $_product->height){
+								
+								$width_prod  = $_product->width * $values['quantity'];
+								$length_prod = $_product->length;
+								$height_prod = $_product->height;
+							
+							} else {
+								//largura é a maior dimensão
+								if($_product->length >= $_product->width && $_product->length >= $_product->height){
+								
+									$width_prod  = $_product->width;
+									$length_prod = $_product->length * $values['quantity'];
+									$height_prod = $_product->height;
+							
+								} else {
+									//altura é a maior dimensão
+									if($_product->height >= $_product->width && $_product->height >= $_product->length){
+								
+									$width_prod  = $_product->width;
+									$length_prod = $_product->length;
+									$height_prod = $_product->height * $values['quantity'];
+							
+									} else {
+										$width_prod  = $_product->width;
+										$length_prod = $_product->length;
+										$height_prod = $_product->height;
+									}
+								}
+							}
+							//armazena as informações do produto * qtde nas variáveis para todo a compra
+							$width  += $width_prod;
+							$length += $length_prod;
+							$height += $height_prod;
+							
+							//o peso e valor sempre é somado multiplicando com a qtde do produto.
+							$weight += $_product->get_weight() * $values['quantity'];
+							$valor_total += $_product->get_price() * $values['quantity'];
 						}
-					}
+					//}
                 }
             }
 			
